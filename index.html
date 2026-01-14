@@ -3,221 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KB Feedback Report: 2024-2025</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>KB Feedback Report: Full Overview</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --prusa-orange: #fa6831;
             --dark-grey: #333;
             --light-grey: #f4f4f4;
             --critical: #dc3545;
-            --warning: #ffc107;
             --success: #28a745;
             --info: #17a2b8;
         }
 
-        body { font-family: 'Roboto', sans-serif; background-color: #f9f9f9; margin: 0; padding: 20px; color: var(--dark-grey); }
-        .container { max-width: 1200px; margin: 0 auto; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f5f7fa; margin: 0; padding: 20px; color: var(--dark-grey); }
+        .container { max-width: 1100px; margin: 0 auto; }
         
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--prusa-orange); padding-bottom: 10px; }
-        h1 { margin: 0; font-size: 24px; }
-        
-        /* KPI Grid */
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; }
-        .card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card .value { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
-        .card .sub { font-size: 13px; color: #888; font-weight: 500; }
-        .card .ratio { font-size: 14px; margin-top: 5px; font-weight: 500; }
+        /* Header */
+        header { background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 6px solid var(--prusa-orange); }
+        h1 { margin: 0; font-size: 24px; color: #333; }
+        .subtitle { color: #666; font-size: 14px; margin-top: 5px; }
 
-        /* Chart Section - Centered */
-        .chart-row { display: flex; justify-content: center; margin-bottom: 40px; }
-        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); height: 350px; width: 60%; }
-        
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; margin-bottom: 40px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
-        th { background-color: var(--dark-grey); color: white; font-size: 14px; }
-        tr:hover { background-color: #fdfdfd; }
-        
-        .url-link { color: var(--prusa-orange); text-decoration: none; font-family: monospace; }
-        
-        .count-val { font-weight: bold; }
-        .c-red { color: var(--critical); }
-        .c-orange { color: #e67e22; }
-        .c-grey { color: #777; }
-        .c-green { color: var(--success); }
+        /* Charts Section */
+        .charts-row { display: flex; gap: 20px; margin-bottom: 30px; }
+        .chart-card { flex: 1; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .chart-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; text-align: center; color: #555; }
+        .canvas-container { position: relative; height: 300px; width: 100%; }
 
-        h2 { margin-top: 40px; margin-bottom: 15px; border-left: 5px solid var(--prusa-orange); padding-left: 15px; font-size: 20px; }
+        /* KPI Badges */
+        .kpi-row { display: flex; gap: 15px; margin-top: 15px; justify-content: center; }
+        .kpi-badge { background: #f0f2f5; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+        .t-green { color: var(--success); }
+        .t-red { color: var(--critical); }
+
+        /* Tables Section */
+        h2 { margin-top: 40px; font-size: 20px; border-left: 4px solid #333; padding-left: 15px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 40px; }
+        th, td { padding: 12px 20px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { background-color: #343a40; color: white; font-weight: 500; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f8f9fa; }
+        
+        .rank { font-weight: bold; color: #888; width: 40px; text-align: center; }
+        .count-col { font-weight: bold; text-align: right; width: 100px; }
+        .reason-col { color: #666; font-style: italic; font-size: 13px; }
+        
+        /* Specific coloring */
+        .count-neg { color: var(--critical); }
+        .count-pos { color: var(--success); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div>
-            <h1>HELP Feedback Report</h1>
-            <span style="font-size: 14px; color: #666;">
-                Data source: Full CSV Analysis<br>
-                Report generated: <strong>Feb 2025</strong>
-            </span>
-        </div>
+        <h1>HELP Feedback form Analysis</h1>
+        <div class="subtitle">Data Source: Full Export (2022 - 2025)</div>
     </header>
 
-    <div class="kpi-grid">
-        <div class="card" style="border-bottom: 4px solid #333;">
-            <h3>All Time (2022-2025)</h3>
-            <div class="value">26,678</div>
-            <div class="sub">Total Records</div>
-            <div class="ratio">
-                <span style="color:var(--success)">75.4%</span> / <span style="color:var(--critical)">24.6%</span>
+    <div class="charts-row">
+        <div class="chart-card">
+            <div class="chart-title">Global Sentiment (Like vs. Dislike)</div>
+            <div class="canvas-container">
+                <canvas id="sentimentChart"></canvas>
+            </div>
+            <div class="kpi-row">
+                <div class="kpi-badge t-green">Likes: 20,119 (75.4%)</div>
+                <div class="kpi-badge t-red">Dislikes: 6,558 (24.6%)</div>
             </div>
         </div>
 
-        <div class="card" style="border-bottom: 4px solid var(--prusa-orange);">
-            <h3>2024 - 2025 (Current)</h3>
-            <div class="value">12,315</div>
-            <div class="sub">Total Records</div>
-            <div class="ratio">
-                <span style="color:var(--success)">73.6%</span> / <span style="color:var(--critical)">26.4%</span>
+        <div class="chart-card">
+            <div class="chart-title">Why do users dislike content?</div>
+            <div class="canvas-container">
+                <canvas id="reasonChart"></canvas>
+            </div>
+            <div style="text-align:center; margin-top:10px; font-size:12px; color:#888;">
+                "Missing Information" is the #1 organic issue.
             </div>
         </div>
-        
-        <div class="card">
-            <h3>Likes (2024-25)</h3>
-            <div class="value" style="color: var(--success)">9,061</div>
-            <div class="sub">👍 Positive Feedback</div>
-        </div>
-
-        <div class="card">
-            <h3>Dislikes (2024-25)</h3>
-            <div class="value" style="color: var(--critical)">2,100</div>
-            <div class="sub">👎 Organic (Spam removed)</div>
-        </div>
     </div>
 
-    <div class="chart-row">
-        <div class="chart-container">
-            <canvas id="categoryChart"></canvas>
-        </div>
-    </div>
-
-    <h2>Top 15 Pain Points (Sorted by Organic Dislikes 2024-2025)</h2>
+    <h2>Top 20 Pain Points (Most Disliked Articles)</h2>
     <table>
         <thead>
             <tr>
-                <th style="width: 30px;">#</th>
-                <th style="width: 250px;">Article Name (ID)</th>
-                <th style="width: 200px;">URL</th>
-                <th>Primary Issue / Root Cause</th>
-                <th style="width: 80px;">Dislikes</th>
+                <th class="rank">#</th>
+                <th>Article Name</th>
+                <th>Primary Feedback / Reason</th>
+                <th class="count-col">Dislikes</th>
             </tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody>
+            <tr><td class="rank">1</td><td>Linear Advance</td><td class="reason-col">Other reason</td><td class="count-col count-neg">591</td></tr>
+            <tr><td class="rank">2</td><td>Supported file formats</td><td class="reason-col">Other reason</td><td class="count-col count-neg">581</td></tr>
+            <tr><td class="rank">3</td><td>Shipping information</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">314</td></tr>
+            <tr><td class="rank">4</td><td>(Unknown / NaN)</td><td class="reason-col">Unknown</td><td class="count-col count-neg">201</td></tr>
+            <tr><td class="rank">5</td><td>General Info (PrusaSlicer)</td><td class="reason-col">Other reason</td><td class="count-col count-neg">124</td></tr>
+            <tr><td class="rank">6</td><td>Insérer une pause... (G-code)</td><td class="reason-col">Facile à comprendre</td><td class="count-col count-neg">101</td></tr>
+            <tr><td class="rank">7</td><td>Informationen zum Versand</td><td class="reason-col">Missing information</td><td class="count-col count-neg">62</td></tr>
+            <tr><td class="rank">8</td><td>Download PrusaSlicer</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">46</td></tr>
+            <tr><td class="rank">9</td><td>Odesílání objednávek - čekací doba</td><td class="reason-col">Chybí potřebné informace</td><td class="count-col count-neg">43</td></tr>
+            <tr><td class="rank">10</td><td>Adjusting belt tension (XL)</td><td class="reason-col">Hard to understand</td><td class="count-col count-neg">39</td></tr>
+            <tr><td class="rank">11</td><td>Stuck filament detection</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">36</td></tr>
+            <tr><td class="rank">12</td><td>Firmware updating (MINI/MINI+)</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">34</td></tr>
+            <tr><td class="rank">13</td><td>Install PrusaSlicer</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">34</td></tr>
+            <tr><td class="rank">14</td><td>Import/Export custom profiles</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">33</td></tr>
+            <tr><td class="rank">15</td><td>VAT & Customs fees</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">32</td></tr>
+            <tr><td class="rank">16</td><td>Layers and perimeters</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">31</td></tr>
+            <tr><td class="rank">17</td><td>Customer support</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">30</td></tr>
+            <tr><td class="rank">18</td><td>Thermal model calibration</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">30</td></tr>
+            <tr><td class="rank">19</td><td>Input Shaper (MK4, XL, MINI/+)</td><td class="reason-col">Hard to understand</td><td class="count-col count-neg">29</td></tr>
+            <tr><td class="rank">20</td><td>First print with PrusaSlicer</td><td class="reason-col">Missing the information I need</td><td class="count-col count-neg">29</td></tr>
+        </tbody>
     </table>
 
-    <h2>Top 10 Most Appreciated Articles (2024-2025)</h2>
+    <h2>Top 10 Most Appreciated (Most Liked Articles)</h2>
     <table>
         <thead>
             <tr>
-                <th style="width: 30px;">#</th>
-                <th style="width: 250px;">Article Name (ID)</th>
-                <th style="width: 200px;">URL</th>
+                <th class="rank">#</th>
+                <th>Article Name</th>
                 <th>User Sentiment</th>
-                <th style="width: 80px;">Likes</th>
+                <th class="count-col">Likes</th>
             </tr>
         </thead>
-        <tbody id="tableBodyPos"></tbody>
+        <tbody>
+            <tr><td class="rank">1</td><td>Infill patterns</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">1,011</td></tr>
+            <tr><td class="rank">2</td><td>General Info / 概要情報</td><td class="reason-col">Other reason</td><td class="count-col count-pos">662</td></tr>
+            <tr><td class="rank">3</td><td>Cut tool</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">521</td></tr>
+            <tr><td class="rank">4</td><td>1. Introduction</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">419</td></tr>
+            <tr><td class="rank">5</td><td>Update firmware MK3S+</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">375</td></tr>
+            <tr><td class="rank">6</td><td>PETG</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">318</td></tr>
+            <tr><td class="rank">7</td><td>Layers and perimeters</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">307</td></tr>
+            <tr><td class="rank">8</td><td>Shipping information</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">306</td></tr>
+            <tr><td class="rank">9</td><td>Fuzzy skin</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">297</td></tr>
+            <tr><td class="rank">10</td><td>Extrusion multiplier calibration</td><td class="reason-col">Easy to understand</td><td class="count-col count-pos">284</td></tr>
+        </tbody>
     </table>
+
 </div>
 
 <script>
-    // --- DATASETS (Exact counts from 2024-2025 CSV) ---
-    
-    // Top 15 Negative (Cleaned of Spam)
-    const negData = [
-        { id: 2297, name: "Shipping information", url: "https://help.prusa3d.com/article/shipping-information_2297", issue: "Outdated/Missing lead times for MK4/XL/Upgrades", dislikes: 156 },
-        { id: 1910, name: "General Info / 概要情報", url: "https://help.prusa3d.com/article/general-info_1910", issue: "General confusion / Navigation issues (esp. JA locale)", dislikes: 88 },
-        { id: 382488, name: "Thermal model calibration", url: "https://help.prusa3d.com/article/thermal-model-calibration_382488", issue: "Revo hotend errors / Calibration loop", dislikes: 36 },
-        { id: 193152, name: "PrusaSlicer G-code viewer", url: "https://help.prusa3d.com/article/prusaslicer-g-code-viewer_193152", issue: "Missing download link / Installation confusion", dislikes: 27 },
-        { id: 2095, name: "SD card not working", url: "https://help.prusa3d.com/article/sd-card-not-working_2095", issue: "Card read in PC but not printer / Formatting", dislikes: 23 },
-        { id: 1698, name: "Support material", url: "https://help.prusa3d.com/article/support-material_1698", issue: "Organic/Tree support settings location", dislikes: 22 },
-        { id: 2220, name: "Download PrusaSlicer", url: "https://help.prusa3d.com/article/download-prusaslicer_2220", issue: "Confusing download page / Linux version", dislikes: 22 },
-        { id: 2225, name: "Firmware updating issues", url: "https://help.prusa3d.com/article/firmware-updating-issues-mk2s-mk3s-mmu2s_2225", issue: "MMU connection issues / USB detection", dislikes: 20 },
-        { id: 2287, name: "Customer support", url: "https://help.prusa3d.com/article/customer-support_2287", issue: "Live chat link hard to find / Login issues", dislikes: 19 },
-        { id: 1779, name: "Cut tool", url: "https://help.prusa3d.com/article/cut-tool_1779", issue: "Connectors rotation / Cutting without filling", dislikes: 19 },
-        { id: 112340, name: "XYZ-calibration error-messages", url: "https://help.prusa3d.com/article/xyz-calibration-error-messages-mk3-mk3s-mk3s_112340", issue: "Generic errors / Missing specific fix steps", dislikes: 18 },
-        { id: 382766, name: "Import/Export custom profiles", url: "https://help.prusa3d.com/article/how-to-import-and-export-custom-profiles-in-prusaslicer_382766", issue: "Profiles disappearing after restart", dislikes: 18 },
-        { id: 160858, name: "Failing Z calibration", url: "https://help.prusa3d.com/article/failing-z-calibration-mk3s-mk2-5s_160858", issue: "Fails despite correct assembly / Pinda height", dislikes: 18 },
-        { id: 1515, name: "Tree supports", url: "https://help.prusa3d.com/article/tree-supports_1515", issue: "Icon missing in older versions / Usage confusion", dislikes: 17 },
-        { id: 245192, name: "How to lift object from bed", url: "https://help.prusa3d.com/article/how-to-lift-object-from-the-print-bed_245192", issue: "User wants to print 'in air' / Stack objects", dislikes: 17 }
-    ];
+    // --- Chart Configuration ---
+    Chart.defaults.font.family = "'Roboto', sans-serif";
+    Chart.defaults.color = '#666';
 
-    // Top 10 Positive (No Guides)
-    const posData = [
-        { id: 177130, name: "Infill patterns", url: "https://help.prusa3d.com/article/infill-patterns_177130", sentiment: "Visual guide / Easy to understand", likes: 470 },
-        { id: 1910, name: "General Info / 概要情報", url: "https://help.prusa3d.com/article/general-info_1910", sentiment: "High Traffic / Helpful", likes: 433 },
-        { id: 2227, name: "Firmware updating (MK3S+)", url: "https://help.prusa3d.com/article/firmware-updating-mk3s-mk3s-mk3_2227", sentiment: "Easy to understand", likes: 194 },
-        { id: 2297, name: "Shipping information", url: "https://help.prusa3d.com/article/shipping-information_2297", sentiment: "Helpful (when updated)", likes: 174 },
-        { id: 1779, name: "Cut tool", url: "https://help.prusa3d.com/article/cut-tool_1779", sentiment: "Feature discovery", likes: 162 },
-        { id: 1748, name: "Layers and perimeters", url: "https://help.prusa3d.com/article/layers-and-perimeters_1748", sentiment: "Easy to understand", likes: 148 },
-        { id: 2059, name: "PETG", url: "https://help.prusa3d.com/article/petg_2059", sentiment: "Easy to understand", likes: 148 },
-        { id: 2257, name: "Extrusion multiplier calibration", url: "https://help.prusa3d.com/article/extrusion-multiplier-calibration_2257", sentiment: "Solved my problem", likes: 144 },
-        { id: 246186, name: "Fuzzy skin", url: "https://help.prusa3d.com/article/fuzzy-skin_246186", sentiment: "Easy to understand", likes: 134 },
-        { id: 1698, name: "Support material", url: "https://help.prusa3d.com/article/support-material_1698", sentiment: "Easy to understand", likes: 127 }
-    ];
-
-    // --- RENDER TABLES ---
-    const tbody = document.getElementById('tableBody');
-    negData.forEach((item, index) => {
-        let countColor = 'c-grey';
-        if(item.dislikes >= 50) countColor = 'c-red';
-        else if(item.dislikes >= 20) countColor = 'c-orange';
-
-        const row = `
-            <tr>
-                <td><b>${index + 1}.</b></td>
-                <td><strong>${item.name}</strong> <small style="color:#999">(${item.id})</small></td>
-                <td><a href="${item.url}" target="_blank" class="url-link">Link ↗</a></td>
-                <td>${item.issue}</td>
-                <td class="${countColor} count-val">${item.dislikes}</td>
-            </tr>
-        `;
-        tbody.innerHTML += row;
-    });
-
-    const tbodyPos = document.getElementById('tableBodyPos');
-    posData.forEach((item, index) => {
-        const row = `
-            <tr>
-                <td><b>${index + 1}.</b></td>
-                <td><strong>${item.name}</strong> <small style="color:#999">(${item.id})</small></td>
-                <td><a href="${item.url}" target="_blank" class="url-link">Link ↗</a></td>
-                <td>${item.sentiment}</td>
-                <td class="c-green count-val">${item.likes}</td>
-            </tr>
-        `;
-        tbodyPos.innerHTML += row;
-    });
-
-    // --- CHART: Categories (Donut) ---
-    new Chart(document.getElementById('categoryChart'), {
+    // 1. Sentiment Chart
+    new Chart(document.getElementById('sentimentChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Slicer/SW', 'Logistics', 'General/Nav', 'Firmware', 'Hardware', 'Calibration'],
+            labels: ['Likes', 'Dislikes'],
             datasets: [{
-                data: [174, 156, 107, 71, 39, 51], // Aggregated from top issues
-                backgroundColor: ['#ffc107', '#e67e22', '#6c757d', '#17a2b8', '#28a745', '#dc3545']
+                data: [20119, 6558],
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderWidth: 0,
+                hoverOffset: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
-                legend: {position: 'bottom', labels: {boxWidth: 10}}, 
-                title: {display: true, text: 'Pain Points by Category'} 
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            },
+            cutout: '65%'
+        }
+    });
+
+    // 2. Reasons Chart
+    new Chart(document.getElementById('reasonChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Missing info', 'Other reason', 'Hard to understand', 'Incorrect info', 'Not specified'],
+            datasets: [{
+                label: 'Count',
+                data: [2858, 2248, 668, 479, 305],
+                backgroundColor: ['#e67e22', '#6c757d', '#17a2b8', '#ffc107', '#e2e6ea'],
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { display: false } }
             }
         }
     });
