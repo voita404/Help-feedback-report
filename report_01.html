@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELP Feedback Form Report: 2024-2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --prusa-orange: #fa6831;
+            --dark-grey: #333;
+            --light-grey: #f4f4f4;
+            --critical: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: #f9f9f9; margin: 0; padding: 20px; color: var(--dark-grey); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--prusa-orange); padding-bottom: 10px; }
+        h1 { margin: 0; font-size: 24px; }
+        
+        /* KPI Grid */
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; }
+        .card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card .value { font-size: 36px; font-weight: bold; margin-bottom: 5px; }
+        .card .sub { font-size: 14px; color: #888; font-weight: 500; }
+
+        /* Sentiment Bar in Card */
+        .sentiment-mini-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+            display: flex;
+            width: 100%;
+        }
+        .sb-pos { background: var(--success); height: 100%; }
+        .sb-neg { background: var(--critical); height: 100%; }
+        
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); height: 350px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; margin-bottom: 40px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+        th { background-color: var(--dark-grey); color: white; font-size: 14px; }
+        tr:hover { background-color: #fdfdfd; }
+        
+        .url-link { color: var(--prusa-orange); text-decoration: none; font-family: monospace; }
+        
+        .count-val { font-weight: bold; }
+        .c-red { color: var(--critical); }
+        .c-orange { color: #e67e22; }
+        .c-grey { color: #777; }
+        .c-green { color: var(--success); }
+
+        .sentiment-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            width: 100px;
+        }
+        .sentiment-fill {
+            height: 100%;
+            background: var(--critical);
+        }
+
+        h2 { margin-top: 40px; margin-bottom: 15px; border-left: 5px solid var(--prusa-orange); padding-left: 15px; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>HELP Feedback Form Report</h1>
+            <span style="font-size: 14px; color: #666;">
+    Article feedback form data export.<br>
+    Range: <strong>Jan 2024 - Jan 2026</strong>
+</span>
+        </div>
+    </header>
+
+    <div class="kpi-grid">
+        <div class="card">
+            <h3>Global Sentiment (Real Users)</h3>
+            <div class="value" style="font-size: 24px; display: flex; justify-content: center; gap: 15px;">
+                <span style="color:var(--success)">77% <small style="font-size:12px; color:#999">Positive</small></span> 
+                <span style="color:#ddd">|</span>
+                <span style="color:var(--critical)">23% <small style="font-size:12px; color:#999">Negative</small></span>
+            </div>
+            <div class="sentiment-mini-bar">
+                <div class="sb-pos" style="width: 77%"></div>
+                <div class="sb-neg" style="width: 23%"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Positive Feedback (Likes)</h3>
+            <div class="value" style="color: var(--success)">8,868</div>
+            <div class="sub">👍 Thumbs Up</div>
+        </div>
+
+        <div class="card">
+            <h3>Negative Feedback (Dislikes)</h3>
+            <div class="value" style="color: var(--critical)">2,678</div>
+            <div class="sub">👎 (SPAM cleaned)</div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-container">
+            <canvas id="dislikeChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <h2>Top 25 Pain Points (Sorted by Organic Dislikes)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 30px;">#</th>
+                <th style="width: 220px;">Article Name</th>
+                <th style="width: 250px;">URL (ID)</th>
+                <th>Primary Issue / Root Cause (Organic)</th>
+                <th style="width: 80px;">Dislikes</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <h2>Top 10 Most Appreciated Articles</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 30px;">#</th>
+                <th style="width: 250px;">Article Name</th>
+                <th style="width: 250px;">URL (ID)</th>
+                <th>User Sentiment / Why they liked it</th>
+                <th style="width: 80px;">Likes</th>
+            </tr>
+        </thead>
+        <tbody id="tableBodyPos"></tbody>
+    </table>
+</div>
+
+<script>
+    // --- NEGATIVE DATASET (Cleaned & Verified) ---
+    // Tags added back for Chart calculation, but NOT displayed in Table
+    const data = [
+        { id: 1, name: "Shipping information", url: "https://help.prusa3d.com/article/shipping-information_2297", issue: "Outdated lead times for MK4/XL upgrades. Users frustrated by delays vs new orders.", dislikes: 310, tags: ["Logistics"] },
+        { id: 2, name: "Layers and perimeters", url: "https://help.prusa3d.com/article/layers-and-perimeters_1748", issue: "Missing context for Arachne & Staggered inner seams.", dislikes: 215, tags: ["Missing Content"] },
+        { id: 3, name: "Linear Advance", url: "https://help.prusa3d.com/article/linear-advance_2252", issue: " Remaining issue: Missing Pressure Advance (MK4/XL) context.", dislikes: 160, tags: ["Firmware"] },
+        { id: 4, name: "MMU2S/3 LEDs meaning", url: "https://help.prusa3d.com/article/mmu2s-leds-meaning_2187", issue: "Confusing Red/Green LED patterns not matching documentation. Idler issues.", dislikes: 155, tags: ["Troubleshooting"] },
+        { id: 5, name: "Loadcell Timeout / Errors (MK4/XL)", url: "https://help.prusa3d.com/article/loadcell-timeout-13528-mk4_405757", issue: "Loadcell test fails on setup. Users unsure if HW or FW issue.", dislikes: 130, tags: ["Hardware"] },
+        { id: 6, name: "Firmware updating (MK4)", url: "https://help.prusa3d.com/article/firmware-updating-mk4-mk3-9_403663", issue: "USB flash issues (formatted correctly but not reading). DFU mode confusion.", dislikes: 110, tags: ["Firmware"] },
+        { id: 7, name: "First Layer Calibration (i3)", url: "https://help.prusa3d.com/article/first-layer-calibration-i3_112364", issue: "Z-offset confusion. Users looking for Loadcell info here by mistake.", dislikes: 95, tags: ["UX"] },
+        { id: 8, name: "Wi-Fi & Prusa Connect (MK4)", url: "https://help.prusa3d.com/article/wi-fi-and-prusa-link-setup-mk4_413008", issue: "Connection timeouts, 'No IP address', static IP setup missing.", dislikes: 85, tags: ["Network"] },
+        { id: 9, name: "Thermal model calibration", url: "https://help.prusa3d.com/article/thermal-model-calibration_382488", issue: "Revo hotend users getting errors. Users want to know how to disable it.", dislikes: 80, tags: ["Firmware"] },
+        { id: 10, name: "Filament not loading (MK4)", url: "https://help.prusa3d.com/article/filament-not-loading-mk4_411680", issue: "Nextruder idler tension confusion. Stuck filament removal.", dislikes: 75, tags: ["Maintenance"] },
+        { id: 11, name: "Support material", url: "https://help.prusa3d.com/article/support-material_1698", issue: "Organic supports settings (Z-distance) and removal difficulty.", dislikes: 65, tags: ["Slicer"] },
+        { id: 12, name: "Homing error X/Y (MK4)", url: "https://help.prusa3d.com/article/homing-error-x-13304-mk4_413180", issue: "Fails self-test repeatedly. Belt tension or obstacle detection false positives.", dislikes: 60, tags: ["Calibration"] },
+        { id: 13, name: "Cut tool", url: "https://help.prusa3d.com/article/cut-tool_1779", issue: "Confusion on rotation of connectors/dowels.", dislikes: 55, tags: ["Slicer"] },
+        { id: 14, name: "Cold pull (MK3S/Mini)", url: "https://help.prusa3d.com/article/cold-pull-mk3s-mk2-5s_2075", issue: "Users applying this logic to Nextruder/MK4 and failing.", dislikes: 50, tags: ["Maintenance"] },
+        { id: 15, name: "SD cards and USB drives", url: "https://help.prusa3d.com/article/sd-cards-and-usb-drives_112290", issue: "exFAT vs FAT32 issues. Mac users struggling with formatting.", dislikes: 45, tags: ["Hardware"] },
+        { id: 16, name: "Text tool", url: "https://help.prusa3d.com/article/text-tool_399460", issue: "Editing text after placement. Font compatibility.", dislikes: 40, tags: ["Slicer"] },
+        { id: 17, name: "Infill patterns", url: "https://help.prusa3d.com/article/infill-patterns_177130", issue: "Missing info on new patterns (Monotonic Lines).", dislikes: 35, tags: ["Missing Content"] },
+        { id: 18, name: "Fuzzy skin", url: "https://help.prusa3d.com/article/fuzzy-skin_246186", issue: "Users want 'Paint-on' fuzzy skin (feature request presented as dislike).", dislikes: 30, tags: ["Feature Request"] },
+        { id: 19, name: "PrusaSlicer G-code viewer", url: "https://help.prusa3d.com/article/prusaslicer-g-code-viewer_193152", issue: "Missing download link (users confused it's part of the main installer).", dislikes: 28, tags: ["UX"] },
+        { id: 20, name: "Seam position", url: "https://help.prusa3d.com/article/seam-position_151069", issue: "Scarf joint info missing. Painting seams confusion.", dislikes: 25, tags: ["Slicer"] },
+        { id: 21, name: "Regular maintenance (MK4)", url: "https://help.prusa3d.com/article/regular-printer-maintenance-mk4_419000", issue: "Lubrication specifics for Nextruder bearings.", dislikes: 22, tags: ["Maintenance"] },
+        { id: 22, name: "Input Shaper", url: "https://help.prusa3d.com/article/input-shaper-mk4_421064", issue: "Calibration vs. Pre-made profiles confusion.", dislikes: 20, tags: ["Advanced"] },
+        { id: 23, name: "Factory reset", url: "https://help.prusa3d.com/article/factory-reset-mk2s-mk2-5s-mk3s_2216", issue: "Did not solve the specific error user was having.", dislikes: 18, tags: ["Troubleshooting"] },
+        { id: 24, name: "Prusa Connect Camera", url: "https://help.prusa3d.com/guide/camera-setup-for-prusalink-prusa-connect_470943", issue: "Setup for non-supported cameras/phones is complex.", dislikes: 15, tags: ["Network"] },
+        { id: 25, name: "Check Axis Length X/Y/Z (MK3S)", url: "https://help.prusa3d.com/article/check-axis-length-x-y-z-mk3s_134223", issue: "Confusion regarding cable bundle interference vs actual geometry.", dislikes: 12, tags: ["Calibration"] }
+    ];
+
+    // --- POSITIVE DATASET ---
+    const posData = [
+        { id: 1, name: "First print with PrusaSlicer", url: "https://help.prusa3d.com/article/first-print-with-prusaslicer_17531", sentiment: "Solved my problem, simple first steps.", likes: 765 },
+        { id: 2, name: "Cut tool", url: "https://help.prusa3d.com/article/cut-tool_1779", sentiment: "Feature discovery: 'Didn't know I could do this'.", likes: 610 },
+        { id: 3, name: "Text tool", url: "https://help.prusa3d.com/article/text-tool_399460", sentiment: "Easy to use for personalization.", likes: 580 },
+        { id: 4, name: "PrusaSlicer - Printables integration", url: "https://help.prusa3d.com/article/prusaslicer-printables-com-integration_3991981", sentiment: "Great workflow improvement.", likes: 430 },
+        { id: 5, name: "Infill patterns", url: "https://help.prusa3d.com/article/infill-patterns_177130", sentiment: "Excellent visual reference.", likes: 360 },
+        { id: 6, name: "PETG / PLA", url: "https://help.prusa3d.com/article/petg_2059", sentiment: "Useful cheat sheet for temps and bed sheets.", likes: 320 },
+        { id: 7, name: "Ironing", url: "https://help.prusa3d.com/article/ironing_1774", sentiment: "Users love the smooth finish result.", likes: 290 },
+        { id: 8, name: "Fuzzy skin", url: "https://help.prusa3d.com/article/fuzzy-skin_246186", sentiment: "Creative texture options appreciated.", likes: 275 },
+        { id: 9, name: "Cold pull (MK3S/Mini)", url: "https://help.prusa3d.com/article/cold-pull-mk3s-mk2-5s_2075", sentiment: "Saved printer from clog, clear steps.", likes: 250 },
+        { id: 10, name: "PLA", url: "https://help.prusa3d.com/article/pla_2062", sentiment: "Basic material reference guide.", likes: 210 }
+    ];
+
+    // --- RENDER NEGATIVE TABLE ---
+    const tbody = document.getElementById('tableBody');
+    data.forEach(item => {
+        let countColor = 'c-grey';
+        if(item.dislikes > 300) countColor = 'c-red';
+        else if(item.dislikes > 100) countColor = 'c-orange';
+
+        const shortUrl = item.url.split('article/')[1] || item.url.split('guide/')[1];
+        
+        // Tags NOT rendered in table, but used for chart
+        const row = `
+            <tr>
+                <td><b>${item.id}.</b></td>
+                <td><strong>${item.name}</strong></td>
+                <td><a href="${item.url}" target="_blank" class="url-link">${shortUrl} ↗</a></td>
+                <td>${item.issue}</td>
+                <td class="${countColor} count-val">${item.dislikes}</td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+
+    // --- RENDER POSITIVE TABLE ---
+    const tbodyPos = document.getElementById('tableBodyPos');
+    posData.forEach(item => {
+        const shortUrl = item.url.split('article/')[1];
+        
+        const row = `
+            <tr>
+                <td><b>${item.id}.</b></td>
+                <td><strong>${item.name}</strong></td>
+                <td><a href="${item.url}" target="_blank" class="url-link">${shortUrl} ↗</a></td>
+                <td>${item.sentiment}</td>
+                <td class="c-green count-val">${item.likes}</td>
+            </tr>
+        `;
+        tbodyPos.innerHTML += row;
+    });
+
+    // --- CHART 1: Top 10 Dislikes ---
+    new Chart(document.getElementById('dislikeChart'), {
+        type: 'bar',
+        data: {
+            labels: data.slice(0, 10).map(d => d.name),
+            datasets: [{
+                label: 'Organic Dislikes (Cleaned Data)',
+                data: data.slice(0, 10).map(d => d.dislikes),
+                backgroundColor: data.slice(0, 10).map(d => d.dislikes > 100 ? '#dc3545' : '#ffc107'),
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: {display: false}, title: {display: true, text: 'Top 10 User Issues'} }
+        }
+    });
+
+    // --- CHART 2: Categories ---
+    let categories = {};
+    data.forEach(i => {
+        let cat = i.tags[0]; 
+        categories[cat] = (categories[cat] || 0) + i.dislikes;
+    });
+
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(categories),
+            datasets: [{
+                data: Object.values(categories),
+                backgroundColor: ['#e67e22', '#dc3545', '#17a2b8', '#ffc107', '#28a745', '#6c757d', '#6610f2', '#fd7e14', '#20c997']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: {position: 'bottom', labels: {boxWidth: 10}}, title: {display: true, text: 'Issues by Category'} }
+        }
+    });
+</script>
+
+</body>
+</html>
